@@ -18,7 +18,6 @@
 		"jsx": "preserve",
 		"jsxFactory": "h",
 		"jsxFragmentFactory": "Fragment",
-		"types": ["@vue/runtime-dom"],
 		"jsxImportSource": "vue",
 
 		/* Linting */

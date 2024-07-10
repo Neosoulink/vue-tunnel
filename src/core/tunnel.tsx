@@ -6,35 +6,42 @@ import {
 	onUpdated,
 	ref,
 	useSlots,
-	VNode,
-	VNodeChild,
 } from "vue";
 
-type State = {
-	nodes: VNodeChild;
+export type State = {
+	nodes: any[];
+	parentUpdated: boolean;
 };
 
 export const tunnel = () => {
-	const store = ref<State>({
-		nodes: [],
-	});
+	const nodes = ref<any[]>([]);
+	const resetNodes = ref<boolean>(true);
+
+	const handleParentUpdate = () => {
+		if (resetNodes.value) nodes.value = [];
+		resetNodes.value = true;
+	};
+
+	onMounted(handleParentUpdate);
+	onUpdated(handleParentUpdate);
 
 	return {
 		In: defineComponent(() => {
 			const slots = useSlots();
-			const updateStore = () => {
-				store.value.nodes =
-					slots.default?.().map((slot) => slot.children as VNode[]) ?? [];
+
+			const getChildren = () => slots.default?.() ?? [];
+			const handleInputUpdate = () => {
+				resetNodes.value = false;
+				nodes.value = getChildren();
 			};
 
-			onMounted(updateStore);
-			onUpdated(updateStore);
+			onMounted(handleInputUpdate);
+			onUpdated(handleInputUpdate);
 
 			return () => {};
-		}, {}),
+		}),
 		Out: defineComponent(() => {
-			// @ts-ignore
-			return () => store.value.nodes;
+			return () => nodes.value;
 		}),
 	};
 };
